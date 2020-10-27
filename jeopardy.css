@@ -1,0 +1,40 @@
+.table-bordered {
+  background-color: #115ff4;
+
+}
+
+th {
+  background-color: rgb(107, 121, 255);
+}
+
+hr {
+  margin: 0;
+}
+
+.table {
+  color: white;
+  font-size: .9em;
+  table-layout: fixed;
+  word-wrap: break-word;
+  
+  visibility: hidden;
+}
+
+td {
+  max-width: 5px;
+  font-size: 1.5em;
+  line-height: 5em;
+}
+
+button {
+  margin-top: 1.5em;
+}
+
+#logo {
+  width: 20%;
+}
+
+.qMark {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
