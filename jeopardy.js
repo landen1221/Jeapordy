@@ -4,7 +4,7 @@ let gameCategories = []
 
 // get list of 100 categories
 async function getCategoryIds(initialID) {
-    const res = await axios.get('http://jservice.io/api/categories', {params: {count: 100, offset: initialID}})
+    const res = await axios.get('https://jservice.io/api/categories', {params: {count: 100, offset: initialID}})
     for (let i =0; i< res.data.length; i++) {
         categories.push(res.data[i].id)
     }
@@ -37,7 +37,7 @@ async function setHeaderRow(gameCat) {
     for (let i=0; i< gameCat.length; i++) {
         // get game category
         let x = gameCat[i]
-        let res = await axios.get('http://jservice.io/api/category', { params: {id: x}})
+        let res = await axios.get('https://jservice.io/api/category', { params: {id: x}})
         
         // set header
         const header = document.querySelector(`#header-${i}`)
@@ -54,7 +54,7 @@ async function setHeaderRow(gameCat) {
         let category = IDName.slice(7,8)  // column
         let clue = IDName.slice(5,6) // row
         
-        let res = await axios.get('http://jservice.io/api/category', { params: {id: gameCategories[category]}})
+        let res = await axios.get('https://jservice.io/api/category', { params: {id: gameCategories[category]}})
         
         let cell = document.getElementById(IDName)
         
