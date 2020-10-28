@@ -1,34 +1,8 @@
-// categories is the main data structure for the app; it looks like this:
-
-//  [
-//    { title: "Math",
-//      clues: [
-//        {question: "2+2", answer: 4, showing: null},
-//        {question: "1+1", answer: 2, showing: null}
-//        ...
-//      ],
-//    },
-//    { title: "Literature",
-//      clues: [
-//        {question: "Hamlet Author", answer: "Shakespeare", showing: null},
-//        {question: "Bell Jar Author", answer: "Plath", showing: null},
-//        ...
-//      ],
-//    },
-//    ...
-//  ]
-
 let categories = [];
-let numCols = 6;
 let initialID = 11531;
 let gameCategories = []
 
-
-/** Get NUM_CATEGORIES random category from API.
- *
- * Returns array of category ids
- */
-
+// get list of 100 categories
 async function getCategoryIds(initialID) {
     const res = await axios.get('http://jservice.io/api/categories', {params: {count: 100, offset: initialID}})
     for (let i =0; i< res.data.length; i++) {
@@ -37,6 +11,7 @@ async function getCategoryIds(initialID) {
     return res.data[res.data.length-1].id
 }
 
+// Adds 300 possible categories to categories list
 async function addThreeHundredCategories() {
     let x = await getCategoryIds(initialID)
     let y = await getCategoryIds(x)
@@ -44,20 +19,7 @@ async function addThreeHundredCategories() {
     getGameCategories()  
 }
 
-
-
-/** Return object with data about a category:
- *
- *  Returns { title: "Math", clues: clue-array }
- *
- * Where clue-array is:
- *   [
- *      {question: "Hamlet Author", answer: "Shakespeare", showing: null},
- *      {question: "Bell Jar Author", answer: "Plath", showing: null},
- *      ...
- *   ]
- */
-
+// Pull 6 categories to use in current game
 function getGameCategories() {
     // assure there's no duplicates
     for (let i=0; i<6; i++) {
@@ -67,9 +29,9 @@ function getGameCategories() {
         }
     } 
 }
-// getGameCategories()
 
-//set header row title
+
+// set header row with category title
 async function setHeaderRow(gameCat) {
     
     for (let i=0; i< gameCat.length; i++) {
@@ -84,19 +46,15 @@ async function setHeaderRow(gameCat) {
     }
 }
 
- // Functionality to show question or solution
+ // Functionality to show question or solution when cell is clicked
  $(document).click(async function(event) {
     let IDName = $(event.target).get()[0].id;
-    console.log(IDName) ////////////
-    console.log(gameCategories)
+    
     if (IDName.slice(0,4) === 'cell') {
         let category = IDName.slice(7,8)  // column
         let clue = IDName.slice(5,6) // row
-
-        console.log(`Category: ${category} \n Clue:${clue}`) ///////////
         
         let res = await axios.get('http://jservice.io/api/category', { params: {id: gameCategories[category]}})
-        console.log(res.data)
         
         let cell = document.getElementById(IDName)
         
@@ -106,59 +64,31 @@ async function setHeaderRow(gameCat) {
         if (cell.className === 'visibleQuestion') {    
             cell.style.fontSize = '1.25em'
             cell.innerHTML = res.data.clues[clue].answer
-            cell.classList.add('visibleSolution')
+            cell.classList.toggle('visibleQuestion')
         } else {
             cell.style.fontSize = '1em'
             cell.innerHTML = res.data.clues[clue].question
             cell.classList.add('visibleQuestion')
-        }     
-        
+        }      
     }
 });
 
-
-// for (let j=0; j<6; j++) {
-//     console.log(res.data.clues[j].question)
-//     document.getElementById(`cell-${i}.${j}`).innerText = res.data.clues[j].question
-// }
-
-/* Fill the HTML table#jeopardy with the categories & cells for questions.
- 
-  - The <thead> should be filled w/a <tr>, and a <td> for each category
-  - The <tbody> should be filled w/NUM_QUESTIONS_PER_CAT <tr>s,
-   each with a question for each category in a <td>
-    (initally, just show a "?" where the question/answer would go.)
-*/ 
-
-// async function fillTable() {
-//     for (let i=0; i< gameCat.length; i++) {
-//         let x = gameCat[i]
-//         let res = await axios.get('http://jservice.io/api/category', { params: {id: x}})
-//         document.querySelector(`#header-${i}`).innerHTML = res.data.title
-//     }
-// }
-
-
-/** Handle clicking on a clue: show the question or answer.
- *
- * Uses .showing property on clue to determine what to show:
- * - if currently null, show question & set .showing to "question"
- * - if currently "question", show answer & set .showing to "answer"
- * - if currently "answer", ignore click
- * */
-
-
-
-
-
-
-
-
 // Start game:
-
 const btn = document.querySelector('button')
-btn.addEventListener('click', async function() {
-    console.log('button clicked')
+btn.addEventListener('click', function(e) {
+    e.preventDefault()
+    if (btn.innerText === "Start Game") {
+        loadPage()
+    } else {
+        document.querySelector('#tableDiv').innerHTML = initialHTML
+        categories = []
+        gameCategories = []
+        loadPage()
+    }
+})
+
+async function loadPage() {
+
     await addThreeHundredCategories()
     await setHeaderRow(gameCategories)
     
@@ -167,36 +97,61 @@ btn.addEventListener('click', async function() {
     let button = document.querySelector('button')
     button.style.backgroundColor = 'red'
     button.innerText = 'Restart'
-
-})
-
-
-
-/** Wipe the current Jeopardy board, show the loading spinner,
- * and update the button used to fetch data.
- */
-
-function showLoadingView() {
-
 }
 
-/** Remove the loading spinner and update the button used to fetch data. */
-
-function hideLoadingView() {
-}
-
-async function setupAndStart() {
-    
-    
-}
-
-/** On click of start / restart button, set up game. */
-
-// TODO
-
-/** On page load, add event handler for clicking clues */
-
-// TODO
-
-
-
+const initialHTML = `<table id="table" class="table table-bordered text-center ">
+<thead>
+      <tr>
+            <th scope="col" id="header-0" class="headers">""</th>
+            <th scope="col" id="header-1" class="headers">""</th>
+            <th scope="col" id="header-2" class="headers">""</th>
+            <th scope="col" id="header-3" class="headers">""</th>
+            <th scope="col" id="header-4" class="headers">""</th>
+            <th scope="col" id="header-5" class="headers">""</th>
+      </tr>
+</thead>
+<tbody>
+      <tr class="h-25">
+            <td id="cell-0.0">?</td>
+            <td id="cell-0.1">?</td>
+            <td id="cell-0.2">?</td>
+            <td id="cell-0.3">?</td>
+            <td id="cell-0.4">?</td>
+            <td id="cell-0.5">?</td>
+      </tr>
+      <tr>
+            <td id="cell-1.0">?</td>
+            <td id="cell-1.1">?</td>
+            <td id="cell-1.2">?</td>
+            <td id="cell-1.3">?</td>
+            <td id="cell-1.4">?</td>
+            <td id="cell-1.5">?</td>
+      </tr>
+      <tr>
+            <td id="cell-2.0">?</td>
+            <td id="cell-2.1">?</td>
+            <td id="cell-2.2">?</td>
+            <td id="cell-2.3">?</td>
+            <td id="cell-2.4">?</td>
+            <td id="cell-2.5">?</td>
+      </tr>
+      <tr>
+            <td id="cell-3.0">?</td>
+            <td id="cell-3.1">?</td>
+            <td id="cell-3.2">?</td>
+            <td id="cell-3.3">?</td>
+            <td id="cell-3.4">?</td>
+            <td id="cell-3.5">?</td>
+      </tr>
+      <tr>
+            <td id="cell-4.0">?</td>
+            <td id="cell-4.1">?</td>
+            <td id="cell-4.2">?</td>
+            <td id="cell-4.3">?</td>
+            <td id="cell-4.4">?</td>
+            <td id="cell-4.5">?</td>
+      </tr>
+      
+</tbody>
+</table>
+</div>`
