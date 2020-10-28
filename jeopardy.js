@@ -19,8 +19,6 @@ async function addThreeHundredCategories() {
     let x = await getCategoryIds(initialID)
     let y = await getCategoryIds(x)
     await getCategoryIds(y)
-
-    getGameCategories()  
 }
 
 // Pull 6 categories to use in current game
@@ -49,7 +47,7 @@ async function setHeaderRow(gameCat) {
     }
 }
 
- // Functionality to show question or solution when cell is clicked
+ // Functionality to show question or solution when TD cell is clicked
  let tableTDs = document.querySelectorAll('td')
  $(tableTDs).click(async function(event) {
     let IDName = $(event.target).get()[0].id;
@@ -80,7 +78,9 @@ async function setHeaderRow(gameCat) {
 async function loadPage() {
     // debugger
     await addThreeHundredCategories()
+    await getGameCategories()
     await setHeaderRow(gameCategories)
+      
     
     document.getElementById('table').style.visibility = "visible"
 
